@@ -679,24 +679,26 @@
             text-decoration: underline;
         }
 
+        /* ===== Week / Time Editor ===== */
         .week-editor {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
+            grid-template-columns: 1fr;
+            gap: 14px;
             margin-top: 14px;
         }
 
         .day-toggle {
             border: 1px solid var(--ink-15);
-            padding: 12px;
+            padding: 14px;
             font-size: 13px;
+            background: var(--white);
         }
 
         .day-toggle .dt-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .dt-head label {
@@ -704,35 +706,107 @@
             align-items: center;
             gap: 8px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 13.5px;
             text-transform: none;
             letter-spacing: 0;
         }
 
         .day-toggle input[type=checkbox] {
             accent-color: var(--ink);
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
         }
 
         .dt-times {
-            display: flex;
-            gap: 6px;
-            opacity: .4;
-            pointer-events: none;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--ink-15);
         }
 
         .dt-times.on {
-            opacity: 1;
-            pointer-events: auto;
+            display: flex;
         }
 
-        .dt-times input {
+        .add-slot-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
             width: 100%;
+        }
+
+        .add-slot-row input[type=time] {
+            flex: 1;
             border: 1px solid var(--ink-15);
-            padding: 6px;
-            font-size: 12.5px;
+            padding: 8px 10px;
+            font-size: 13px;
             background: var(--ice);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .btn-add-slot {
+            background: var(--ink);
+            color: var(--ice);
+            border: 1px solid var(--ink);
+            padding: 8px 14px;
+            font-size: 11px;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            border-radius: 2px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all .15s ease;
+        }
+
+        .btn-add-slot:hover {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn-gen-slots {
+            background: none;
+            border: none;
+            color: var(--ink-60);
+            font-size: 11px;
+            letter-spacing: .03em;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .btn-gen-slots:hover {
+            color: var(--ink);
+        }
+
+        .day-slots-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+            min-height: 26px;
+        }
+
+        .slot-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ice-2);
+            border: 1px solid var(--ink-15);
+            padding: 4px 10px;
+            font-size: 12.5px;
+            border-radius: 2px;
+        }
+
+        .slot-tag button {
+            background: none;
+            border: none;
+            color: #7a2e2e;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 1;
         }
 
         .stat-row {
@@ -886,7 +960,7 @@
             background: var(--ice);
             border: 1px solid var(--ink-15);
             padding: 34px;
-            max-width: 500px;
+            max-width: 520px;
             width: 100%;
             max-height: 86vh;
             overflow: auto;
@@ -1082,18 +1156,6 @@
                 margin-bottom: 18px;
             }
 
-            .week-editor {
-                grid-template-columns: 1fr;
-            }
-
-            .dt-times {
-                flex-wrap: wrap;
-            }
-
-            .dt-times input {
-                min-width: 70px;
-            }
-
             .stat-row {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -1242,7 +1304,7 @@
             <!-- Profissionais -->
             <div id="admin-prof">
                 <div class="section-head">
-                    <div style="font-size:13px; color:var(--ink-40)">Cadastre, defina agenda, bloqueie folgas e gere o link de cada profissional</div>
+                    <div style="font-size:13px; color:var(--ink-40)">Cadastre, defina os horários exatos de atendimento e gere o link de cada profissional</div>
                     <button class="btn" onclick="openProModal()">+ Nova profissional</button>
                 </div>
                 <div class="card-panel" id="proAdminList"></div>
@@ -1325,7 +1387,7 @@
             </div>
             
             <div class="field">
-                <label>Dias da semana de atendimento</label>
+                <label>Dias e horários de atendimento</label>
                 <div class="week-editor" id="weekEditor"></div>
             </div>
 
@@ -1384,8 +1446,8 @@
            DATA LAYER — Vercel API + Neon DB + LocalStorage Fallback
            ============================================================ */
         const WEEKDAYS = [
-            { k: 'seg', label: 'Seg' }, { k: 'ter', label: 'Ter' }, { k: 'qua', label: 'Qua' },
-            { k: 'qui', label: 'Qui' }, { k: 'sex', label: 'Sex' }, { k: 'sab', label: 'Sáb' }, { k: 'dom', label: 'Dom' }
+            { k: 'seg', label: 'Segunda-feira' }, { k: 'ter', label: 'Terça-feira' }, { k: 'qua', label: 'Quarta-feira' },
+            { k: 'qui', label: 'Quinta-feira' }, { k: 'sex', label: 'Sexta-feira' }, { k: 'sab', label: 'Sábado' }, { k: 'dom', label: 'Domingo' }
         ];
 
         let professionals = [];
@@ -1393,16 +1455,33 @@
         let expenses = [];
         let isApiMode = true;
         let currentBlockedDates = [];
+        let daySlotsState = {};
 
         function seedPros() {
             return [
                 {
                     id: 'p1', name: 'Larissa Nunes', role: 'Cabeleireira', phone: '5586999990001', price: 120, avatarUrl: '', blockedDates: [],
-                    schedule: { seg: { on: true, start: '09:00', end: '18:00', interval: 60 }, ter: { on: true, start: '09:00', end: '18:00', interval: 60 }, qua: { on: true, start: '09:00', end: '18:00', interval: 60 }, qui: { on: true, start: '09:00', end: '18:00', interval: 60 }, sex: { on: true, start: '09:00', end: '18:00', interval: 60 }, sab: { on: false }, dom: { on: false } }
+                    schedule: { 
+                        seg: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
+                        ter: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
+                        qua: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
+                        qui: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
+                        sex: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
+                        sab: { on: false, slots: [] }, 
+                        dom: { on: false, slots: [] } 
+                    }
                 },
                 {
                     id: 'p2', name: 'Bruna Alves', role: 'Designer de cílios', phone: '5586999990002', price: 90, avatarUrl: '', blockedDates: [],
-                    schedule: { seg: { on: false }, ter: { on: true, start: '10:00', end: '17:00', interval: 90 }, qua: { on: true, start: '10:00', end: '17:00', interval: 90 }, qui: { on: true, start: '10:00', end: '17:00', interval: 90 }, sex: { on: true, start: '10:00', end: '17:00', interval: 90 }, sab: { on: true, start: '09:00', end: '14:00', interval: 90 }, dom: { on: false } }
+                    schedule: { 
+                        seg: { on: false, slots: [] }, 
+                        ter: { on: true, slots: ['10:00', '11:30', '14:00', '15:30'] }, 
+                        qua: { on: true, slots: ['10:00', '11:30', '14:00', '15:30'] }, 
+                        qui: { on: true, slots: ['10:00', '11:30', '14:00', '15:30'] }, 
+                        sex: { on: true, slots: ['10:00', '11:30', '14:00', '15:30'] }, 
+                        sab: { on: true, slots: ['09:00', '10:30', '12:00'] }, 
+                        dom: { on: false, slots: [] } 
+                    }
                 },
             ];
         }
@@ -1681,12 +1760,21 @@
         function genSlots(schedule, dayKey) {
             const cfg = schedule[dayKey];
             if (!cfg || !cfg.on) return [];
-            const [sh, sm] = cfg.start.split(':').map(Number);
-            const [eh, em] = cfg.end.split(':').map(Number);
-            let cur = sh * 60 + sm; const end = eh * 60 + em; const step = Number(cfg.interval) || 60;
-            const out = [];
-            while (cur < end) { out.push(String(Math.floor(cur / 60)).padStart(2, '0') + ':' + String(cur % 60).padStart(2, '0')); cur += step; }
-            return out;
+            
+            if (Array.isArray(cfg.slots) && cfg.slots.length > 0) {
+                return [...cfg.slots].sort();
+            }
+            
+            if (cfg.start && cfg.end) {
+                const [sh, sm] = cfg.start.split(':').map(Number);
+                const [eh, em] = cfg.end.split(':').map(Number);
+                let cur = sh * 60 + sm; const end = eh * 60 + em; const step = Number(cfg.interval) || 60;
+                const out = [];
+                while (cur < end) { out.push(String(Math.floor(cur / 60)).padStart(2, '0') + ':' + String(cur % 60).padStart(2, '0')); cur += step; }
+                return out;
+            }
+
+            return [];
         }
 
         function renderTimeGrid() {
@@ -1758,7 +1846,7 @@
         }
 
         /* ============================================================
-           ADMIN — abas e visualizaciones
+           ADMIN — abas e visualizações
            ============================================================ */
         function adminTab(t) {
             document.getElementById('tabProf').classList.toggle('active', t === 'prof');
@@ -1790,7 +1878,7 @@
         </div>
       </div>
       <div class="row-actions">
-        <button onclick="openProModal('${escapeHTML(p.id)}')">Editar / Bloqueios</button>
+        <button onclick="openProModal('${escapeHTML(p.id)}')">Editar Horários</button>
         <button onclick="deletePro('${escapeHTML(p.id)}')">Remover</button>
       </div>
     </div>`;
@@ -1840,26 +1928,104 @@
             renderAdminPros();
         }
 
+        /* ============================================================
+           EDITOR DE HORÁRIOS CUSTOMIZADOS POR DIA
+           ============================================================ */
+        function initDaySlotsState(schedule) {
+            daySlotsState = {};
+            WEEKDAYS.forEach(w => {
+                const cfg = schedule ? schedule[w.k] : null;
+                if (cfg && Array.isArray(cfg.slots) && cfg.slots.length > 0) {
+                    daySlotsState[w.k] = [...cfg.slots].sort();
+                } else if (cfg && cfg.on && cfg.start && cfg.end) {
+                    daySlotsState[w.k] = genSlots(schedule, w.k);
+                } else if (!schedule) {
+                    // Padrão inicial para nova profissional (09:00 até 18:00) nos dias úteis
+                    if (['seg', 'ter', 'qua', 'qui', 'sex'].includes(w.k)) {
+                        daySlotsState[w.k] = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+                    } else {
+                        daySlotsState[w.k] = [];
+                    }
+                } else {
+                    daySlotsState[w.k] = [];
+                }
+            });
+        }
+
+        function renderDaySlotsTags(dayKey) {
+            const listEl = document.getElementById('slots-list-' + dayKey);
+            if (!listEl) return;
+            const slots = daySlotsState[dayKey] || [];
+            if (slots.length === 0) {
+                listEl.innerHTML = '<span style="font-size:11.5px; color:var(--ink-40)">Nenhum horário adicionado.</span>';
+                return;
+            }
+            listEl.innerHTML = slots.map(t => `
+                <span class="slot-tag">
+                    ${escapeHTML(t)} 
+                    <button type="button" onclick="removeSlotFromDay('${dayKey}', '${escapeHTML(t)}')">✕</button>
+                </span>
+            `).join('');
+        }
+
+        function addSlotToDay(dayKey) {
+            const input = document.getElementById('new-slot-' + dayKey);
+            if (!input) return;
+            const timeVal = input.value;
+            if (!timeVal) { showToast('Selecione um horário'); return; }
+            
+            if (!daySlotsState[dayKey]) daySlotsState[dayKey] = [];
+            if (daySlotsState[dayKey].includes(timeVal)) {
+                showToast('Este horário já foi adicionado');
+                return;
+            }
+            
+            daySlotsState[dayKey].push(timeVal);
+            daySlotsState[dayKey].sort();
+            renderDaySlotsTags(dayKey);
+            showToast(`Horário ${timeVal} adicionado!`);
+        }
+
+        function removeSlotFromDay(dayKey, timeVal) {
+            if (!daySlotsState[dayKey]) return;
+            daySlotsState[dayKey] = daySlotsState[dayKey].filter(t => t !== timeVal);
+            renderDaySlotsTags(dayKey);
+        }
+
+        function autoGenDaySlots(dayKey) {
+            daySlotsState[dayKey] = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+            renderDaySlotsTags(dayKey);
+            showToast('Horários padrão gerados!');
+        }
+
         function buildWeekEditor(schedule) {
+            initDaySlotsState(schedule);
             const el = document.getElementById('weekEditor');
             el.innerHTML = WEEKDAYS.map(w => {
-                const cfg = (schedule && schedule[w.k]) || { on: false, start: '09:00', end: '18:00', interval: 60 };
+                const cfg = (schedule && schedule[w.k]) || { on: ['seg', 'ter', 'qua', 'qui', 'sex'].includes(w.k) };
                 return `
     <div class="day-toggle" data-day="${w.k}">
       <div class="dt-head">
-        <label><input type="checkbox" ${cfg.on ? 'checked' : ''} onchange="toggleDay(this)"> ${w.label}</label>
+        <label><input type="checkbox" ${cfg.on ? 'checked' : ''} onchange="toggleDay(this, '${w.k}')"> ${w.label}</label>
+        <button type="button" class="btn-gen-slots" onclick="autoGenDaySlots('${w.k}')">Gerar Padrão (09h-18h)</button>
       </div>
       <div class="dt-times ${cfg.on ? 'on' : ''}">
-        <input type="time" class="dt-start" value="${cfg.start || '09:00'}">
-        <input type="time" class="dt-end" value="${cfg.end || '18:00'}">
-        <input type="number" class="dt-interval" value="${cfg.interval || 60}" title="minutos por horário" style="width:60px">
+        <div class="add-slot-row">
+          <input type="time" id="new-slot-${w.k}" value="09:00">
+          <button type="button" class="btn-add-slot" onclick="addSlotToDay('${w.k}')">+ Adicionar</button>
+        </div>
+        <div class="day-slots-list" id="slots-list-${w.k}"></div>
       </div>
     </div>`;
             }).join('');
+
+            // Renderiza as tags de horários existentes para cada dia
+            WEEKDAYS.forEach(w => renderDaySlotsTags(w.k));
         }
 
-        function toggleDay(cb) {
-            cb.closest('.day-toggle').querySelector('.dt-times').classList.toggle('on', cb.checked);
+        function toggleDay(cb, dayKey) {
+            const container = cb.closest('.day-toggle').querySelector('.dt-times');
+            container.classList.toggle('on', cb.checked);
         }
 
         function previewAvatar(input) {
@@ -1961,13 +2127,10 @@
                     const on = el.querySelector('input[type=checkbox]').checked;
                     schedule[k] = {
                         on,
-                        start: el.querySelector('.dt-start').value,
-                        end: el.querySelector('.dt-end').value,
-                        interval: Number(el.querySelector('.dt-interval').value) || 60
+                        slots: (daySlotsState[k] || []).sort()
                     };
                 });
 
-                // Inclui blockedDates dentro do schedule para compatibilidade JSON no banco
                 schedule.blockedDates = currentBlockedDates;
 
                 let proObj;
