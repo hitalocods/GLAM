@@ -1379,8 +1379,6 @@
                     placeholder="Cabeleireira, Manicure, Maquiadora, Designer de cílios..."></div>
             <div class="field"><label>WhatsApp (só números, com DDD)</label><input id="proPhone"
                     placeholder="86900000000"></div>
-            <div class="field"><label>Valor médio do serviço (R$)</label><input id="proPrice" type="number"
-                    placeholder="80"></div>
             <div class="field">
                 <label>Foto de Perfil (Vercel Blob)</label>
                 <div class="avatar-preview-box">
@@ -1886,7 +1884,7 @@
         ${renderAvatarHtml(p)}
         <div>
           <div class="pro-mini-name">${escapeHTML(p.name)}</div>
-          <div class="pro-mini-role">${escapeHTML(p.role)} · ${money(p.price)}</div>
+          <div class="pro-mini-role">${escapeHTML(p.role)}</div>
           <div class="link-box"><input readonly value="${escapeHTML(link)}"><button onclick="copyLink('${escapeHTML(link)}', this)">Copiar link</button></div>
         </div>
       </div>
@@ -2093,7 +2091,6 @@
             document.getElementById('proName').value = p ? p.name : '';
             document.getElementById('proRole').value = p ? p.role : '';
             document.getElementById('proPhone').value = p ? p.phone : '';
-            document.getElementById('proPrice').value = p ? p.price : '';
             document.getElementById('proAvatarUrl').value = p ? (p.avatarUrl || '') : '';
             document.getElementById('proAvatarInput').value = '';
             
@@ -2119,7 +2116,6 @@
             const name = document.getElementById('proName').value.trim();
             const role = document.getElementById('proRole').value.trim();
             const phone = document.getElementById('proPhone').value.trim();
-            const price = Number(document.getElementById('proPrice').value) || 0;
             const avatarInput = document.getElementById('proAvatarInput');
             let avatarUrl = document.getElementById('proAvatarUrl').value;
 
@@ -2149,9 +2145,9 @@
                 let proObj;
                 if (id) {
                     proObj = professionals.find(x => x.id === id);
-                    Object.assign(proObj, { name, role, phone, price, avatarUrl, schedule, blockedDates: currentBlockedDates });
+                    Object.assign(proObj, { name, role, phone, avatarUrl, schedule, blockedDates: currentBlockedDates });
                 } else {
-                    proObj = { id: 'p' + Date.now(), name, role, phone, price, avatarUrl, schedule, blockedDates: currentBlockedDates };
+                    proObj = { id: 'p' + Date.now(), name, role, phone, avatarUrl, schedule, blockedDates: currentBlockedDates };
                     professionals.push(proObj);
                 }
 
