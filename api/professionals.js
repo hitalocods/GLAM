@@ -13,18 +13,36 @@ module.exports = async function handler(req, res) {
                 FROM professionals 
                 ORDER BY created_at ASC
             `;
-            return res.status(200).json({ ok: true, data: rows });
+            const data = rows.map(r => {
+                const sched = r.schedule || {};
+                return {
+                    id: r.id,
+                    name: r.name,
+                    role: r.role,
+                    phone: r.phone,
+                    price: r.price,
+                    avatarUrl: r.avatarUrl,
+                    schedule: sched,
+                    services: r.services || sched.services || [],
+                    blockedDates: r.blockedDates || sched.blockedDates || []
+                };
+            });
+            return res.status(200).json({ ok: true, data: data });
         }
 
         if (req.method === 'POST') {
-            const { id, name, role, phone, price, avatarUrl, schedule } = req.body;
+            const { id, name, role, phone, price, avatarUrl, schedule, services, blockedDates } = req.body;
             if (!id || !name || !role || !phone) {
                 return res.status(400).json({ ok: false, error: 'Campos obrigatórios ausentes.' });
             }
 
+            const fullSchedule = schedule || {};
+            if (services) fullSchedule.services = services;
+            if (blockedDates) fullSchedule.blockedDates = blockedDates;
+
             await sql`
                 INSERT INTO professionals (id, name, role, phone, price, avatar_url, schedule)
-                VALUES (${id}, ${name}, ${role}, ${phone}, ${price || 0}, ${avatarUrl || null}, ${JSON.stringify(schedule)})
+                VALUES (${id}, ${name}, ${role}, ${phone}, ${price || 0}, ${avatarUrl || null}, ${JSON.stringify(fullSchedule)})
                 ON CONFLICT (id) DO UPDATE SET
                     name = EXCLUDED.name,
                     role = EXCLUDED.role,

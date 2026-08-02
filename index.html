@@ -384,6 +384,59 @@
             transform: translateX(3px);
         }
 
+        /* ===== Service Cards ===== */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 24px 20px;
+            border: 1px solid var(--ink-08);
+            border-radius: 18px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 16px;
+            transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 16px rgba(18, 18, 18, 0.03);
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--ink-15);
+            box-shadow: 0 12px 28px rgba(18, 18, 18, 0.08);
+        }
+
+        .service-card.selected {
+            background: var(--ink);
+            color: var(--ice);
+            border-color: var(--ink);
+            box-shadow: 0 8px 24px rgba(18, 18, 18, 0.2);
+        }
+
+        .service-name {
+            font-size: 15.5px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .service-price {
+            font-family: var(--serif);
+            font-size: 20px;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .service-card.selected .service-price {
+            color: var(--ice);
+        }
+
         .empty {
             padding: 60px 24px;
             text-align: center;
@@ -994,7 +1047,7 @@
             background: var(--ice);
             border: 1px solid var(--ink-15);
             padding: 34px;
-            max-width: 520px;
+            max-width: 540px;
             width: 100%;
             max-height: 86vh;
             overflow: auto;
@@ -1029,7 +1082,7 @@
             border: 1px solid var(--ink-15);
             padding: 4px 10px;
             font-size: 12px;
-            border-radius: 2px;
+            border-radius: 20px;
         }
 
         .blocked-tag button {
@@ -1104,6 +1157,10 @@
 
             .pro-grid {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .service-grid {
+                grid-template-columns: 1fr;
             }
 
             .pro-card {
@@ -1184,12 +1241,7 @@
             .modal {
                 padding: 22px 18px;
                 max-height: 92vh;
-                border-radius: 4px;
-            }
-
-            .modal h3 {
-                font-size: 19px;
-                margin-bottom: 18px;
+                border-radius: 20px;
             }
 
             .stat-row {
@@ -1263,16 +1315,25 @@
                 <div id="proGrid" class="pro-grid"></div>
             </div>
 
-            <!-- STEP 2: dia -->
+            <!-- STEP 2: serviço -->
+            <div id="step-service" class="step-panel" style="display:none">
+                <div class="section-head">
+                    <div class="section-title">Escolha o serviço</div>
+                    <a class="back-link" onclick="backTo('pro')">← trocar profissional</a>
+                </div>
+                <div id="serviceGrid" class="service-grid"></div>
+            </div>
+
+            <!-- STEP 3: dia -->
             <div id="step-day" class="step-panel" style="display:none">
                 <div class="section-head">
                     <div class="section-title">Escolha o dia</div>
-                    <a class="back-link" onclick="backTo('pro')">← trocar profissional</a>
+                    <a class="back-link" onclick="backTo('service')">← trocar serviço</a>
                 </div>
                 <div id="dayRow" class="day-row"></div>
             </div>
 
-            <!-- STEP 3: horario -->
+            <!-- STEP 4: horario -->
             <div id="step-time" class="step-panel" style="display:none">
                 <div class="section-head">
                     <div class="section-title">Escolha o horário</div>
@@ -1281,7 +1342,7 @@
                 <div id="timeGrid" class="time-grid"></div>
             </div>
 
-            <!-- STEP 4: dados -->
+            <!-- STEP 5: dados -->
             <div id="step-form" class="step-panel" style="display:none">
                 <div class="section-head">
                     <div class="section-title">Seus dados</div>
@@ -1291,13 +1352,12 @@
                     <div class="summary-box" id="summaryBox"></div>
                     <div class="field"><label>Nome completo</label><input id="cName" placeholder="Seu nome"></div>
                     <div class="field"><label>WhatsApp</label><input id="cPhone" placeholder="(86) 90000-0000"></div>
-                    <div class="field"><label>Serviço desejado</label><input id="cService"
-                            placeholder="Ex.: escova, unha em gel, mega hair..."></div>
+                    <div class="field" style="display:none"><input id="cService"></div>
                     <button class="btn" id="btnConfirmBooking" onclick="confirmBooking()">Confirmar e enviar no WhatsApp</button>
                 </div>
             </div>
 
-            <!-- STEP 5: confirmação -->
+            <!-- STEP 6: confirmação -->
             <div id="step-done" class="step-panel" style="display:none">
                 <div class="confirm-screen">
                     <div class="mark">✓</div>
@@ -1344,7 +1404,7 @@
             <!-- Profissionais -->
             <div id="admin-prof">
                 <div class="section-head">
-                    <div style="font-size:13px; color:var(--ink-40)">Cadastre, defina os horários exatos de atendimento e gere o link de cada profissional</div>
+                    <div style="font-size:13px; color:var(--ink-40)">Cadastre serviços, defina os horários e gere o link de cada profissional</div>
                     <button class="btn" onclick="openProModal()">+ Nova profissional</button>
                 </div>
                 <div class="card-panel" id="proAdminList"></div>
@@ -1411,7 +1471,7 @@
             <h3 id="proModalTitle">Nova profissional</h3>
             <input type="hidden" id="proId">
             <div class="field"><label>Nome</label><input id="proName"></div>
-            <div class="field"><label>Função</label><input id="proRole"
+            <div class="field"><label>Função / Especialidade</label><input id="proRole"
                     placeholder="Cabeleireira, Manicure, Maquiadora, Designer de cílios..."></div>
             <div class="field"><label>WhatsApp (só números, com DDD)</label><input id="proPhone"
                     placeholder="86900000000"></div>
@@ -1423,17 +1483,28 @@
                     <input type="hidden" id="proAvatarUrl">
                 </div>
             </div>
-            
-            <div class="field">
+
+            <!-- Serviços Oferecidos -->
+            <div class="field" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--ink-15);">
+                <label>Serviços oferecidos por esta profissional</label>
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <input type="text" id="newServiceName" placeholder="Nome do serviço (ex: Escova)" style="flex:2; border:1px solid var(--ink-15); padding:8px 10px; font-size:13px; background:var(--ice); border-radius:8px;">
+                    <input type="number" id="newServicePrice" placeholder="R$" style="flex:1; border:1px solid var(--ink-15); padding:8px 10px; font-size:13px; background:var(--ice); border-radius:8px;">
+                    <button type="button" class="btn" style="padding:8px 14px; font-size:11px;" onclick="addServiceToPro()">+ Adicionar</button>
+                </div>
+                <div id="proServicesList" style="display:flex; flex-direction:column; gap:6px; margin-top:8px;"></div>
+            </div>
+
+            <div class="field" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--ink-15);">
                 <label>Dias e horários de atendimento</label>
                 <div class="week-editor" id="weekEditor"></div>
             </div>
 
             <!-- Bloqueio de Datas Específicas -->
-            <div class="field" style="margin-top:24px; padding-top:18px; border-top:1px solid var(--ink-15);">
+            <div class="field" style="margin-top:20px; padding-top:16px; border-top:1px solid var(--ink-15);">
                 <label>Bloquear datas específicas (folgas / feriados)</label>
                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                    <input type="date" id="blockDateInput" style="flex:1; border:1px solid var(--ink-15); padding:8px 10px; font-size:13px; background:var(--ice);">
+                    <input type="date" id="blockDateInput" style="flex:1; border:1px solid var(--ink-15); padding:8px 10px; font-size:13px; background:var(--ice); border-radius:8px;">
                     <button type="button" class="btn" style="padding:8px 14px; font-size:11px;" onclick="addBlockedDate()">+ Bloquear Data</button>
                 </div>
                 <div id="blockedDatesList" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
@@ -1493,12 +1564,19 @@
         let expenses = [];
         let isApiMode = true;
         let currentBlockedDates = [];
+        let currentProServices = [];
         let daySlotsState = {};
 
         function seedPros() {
             return [
                 {
-                    id: 'p1', name: 'Larissa Nunes', role: 'Cabeleireira', phone: '5586999990001', price: 120, avatarUrl: '', blockedDates: [],
+                    id: 'p1', name: 'Larissa Nunes', role: 'Cabeleireira', phone: '5586999990001', avatarUrl: '', blockedDates: [],
+                    services: [
+                        { id: 's1', name: 'Corte + Escova', price: 120 },
+                        { id: 's2', name: 'Escova Modelada', price: 60 },
+                        { id: 's3', name: 'Hidratação Profunda', price: 90 },
+                        { id: 's4', name: 'Coloração Completa', price: 180 }
+                    ],
                     schedule: { 
                         seg: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
                         ter: { on: true, slots: ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'] },
@@ -1510,7 +1588,13 @@
                     }
                 },
                 {
-                    id: 'p2', name: 'Bruna Alves', role: 'Designer de cílios', phone: '5586999990002', price: 90, avatarUrl: '', blockedDates: [],
+                    id: 'p2', name: 'Bruna Alves', role: 'Designer de cílios', phone: '5586999990002', avatarUrl: '', blockedDates: [],
+                    services: [
+                        { id: 's5', name: 'Extensão Fio a Fio', price: 110 },
+                        { id: 's6', name: 'Volume Russo', price: 150 },
+                        { id: 's7', name: 'Manutenção de Cílios', price: 80 },
+                        { id: 's8', name: 'Lash Lifting', price: 90 }
+                    ],
                     schedule: { 
                         seg: { on: false, slots: [] }, 
                         ter: { on: true, slots: ['10:00', '11:30', '14:00', '15:30'] }, 
@@ -1535,6 +1619,7 @@
                 if (json.ok && json.data) {
                     professionals = json.data.map(p => ({
                         ...p,
+                        services: p.services || (p.schedule && p.schedule.services) || [],
                         blockedDates: p.blockedDates || (p.schedule && p.schedule.blockedDates) || []
                     }));
                 } else {
@@ -1682,17 +1767,21 @@
         /* ============================================================
            CLIENT FLOW STATE
            ============================================================ */
-        let flow = { proId: null, date: null, time: null };
+        let flow = { proId: null, serviceId: null, date: null, time: null };
         const STEPS = [
-            { k: 'pro', label: 'Profissional' }, { k: 'day', label: 'Dia' },
-            { k: 'time', label: 'Horário' }, { k: 'form', label: 'Seus dados' }
+            { k: 'pro', label: 'Profissional' },
+            { k: 'service', label: 'Serviço' },
+            { k: 'day', label: 'Dia' },
+            { k: 'time', label: 'Horário' },
+            { k: 'form', label: 'Seus dados' }
         ];
 
         function currentStepIndex() {
             if (!flow.proId) return 0;
-            if (!flow.date) return 1;
-            if (!flow.time) return 2;
-            return 3;
+            if (!flow.serviceId) return 1;
+            if (!flow.date) return 2;
+            if (!flow.time) return 3;
+            return 4;
         }
 
         function renderStepper() {
@@ -1707,7 +1796,7 @@
         }
 
         function showStepPanel() {
-            ['pro', 'day', 'time', 'form', 'done'].forEach(k => {
+            ['pro', 'service', 'day', 'time', 'form', 'done'].forEach(k => {
                 document.getElementById('step-' + k).style.display = 'none';
             });
             const idx = currentStepIndex();
@@ -1716,7 +1805,8 @@
         }
 
         function backTo(step) {
-            if (step === 'pro') flow = { proId: null, date: null, time: null };
+            if (step === 'pro') flow = { proId: null, serviceId: null, date: null, time: null };
+            if (step === 'service') { flow.serviceId = null; flow.date = null; flow.time = null; }
             if (step === 'day') { flow.date = null; flow.time = null; }
             if (step === 'time') { flow.time = null; }
             document.getElementById('step-done').dataset.show = '0';
@@ -1724,7 +1814,7 @@
         }
 
         function resetFlow() {
-            flow = { proId: null, date: null, time: null };
+            flow = { proId: null, serviceId: null, date: null, time: null };
             document.getElementById('step-done').dataset.show = '0';
             renderClientFlow();
         }
@@ -1733,6 +1823,7 @@
             renderStepper();
             showStepPanel();
             if (!flow.proId) renderProGrid();
+            else if (!flow.serviceId) renderServiceGrid();
             else if (!flow.date) renderDayRow();
             else if (!flow.time) renderTimeGrid();
             else renderForm();
@@ -1748,12 +1839,49 @@
         <div class="pro-name">${escapeHTML(p.name)}</div>
         <div class="pro-role">${escapeHTML(p.role)}</div>
       </div>
-      <div class="pro-cta">Ver agenda <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3"/></svg></div>
+      <div class="pro-cta">Ver serviços <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3"/></svg></div>
     </button>
   `).join('');
         }
 
-        function selectPro(id) { flow.proId = id; flow.date = null; flow.time = null; renderClientFlow(); }
+        function selectPro(id) { 
+            flow.proId = id; 
+            flow.serviceId = null; 
+            flow.date = null; 
+            flow.time = null; 
+            renderClientFlow(); 
+        }
+
+        function renderServiceGrid() {
+            const pro = professionals.find(p => p.id === flow.proId);
+            const grid = document.getElementById('serviceGrid');
+            if (!pro) { grid.innerHTML = '<div class="empty">Profissional não encontrada.</div>'; return; }
+            
+            const services = pro.services || [];
+            if (services.length === 0) {
+                grid.innerHTML = '<div class="empty">Nenhum serviço cadastrado para esta profissional ainda.</div>';
+                return;
+            }
+
+            grid.innerHTML = services.map(s => `
+    <button class="service-card ${flow.serviceId === s.id ? 'selected' : ''}" onclick="selectService('${escapeHTML(s.id)}')">
+        <div>
+            <div class="service-name">${escapeHTML(s.name)}</div>
+            <div class="service-price">${money(s.price)}</div>
+        </div>
+        <div class="pro-cta" style="${flow.serviceId === s.id ? 'color:var(--ice)' : ''}">
+            Escolher <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3"/></svg>
+        </div>
+    </button>
+  `).join('');
+        }
+
+        function selectService(sId) {
+            flow.serviceId = sId;
+            flow.date = null;
+            flow.time = null;
+            renderClientFlow();
+        }
 
         function nextNDays(n) {
             const out = []; const d = new Date();
@@ -1770,7 +1898,6 @@
             
             const blockedSet = new Set(pro.blockedDates || []);
 
-            // Gera os próximos 30 dias para exibir todo o mês
             const days = nextNDays(30).filter(d => {
                 const key = dayKeyFromDate(d);
                 const iso = fmtDate(d);
@@ -1833,30 +1960,41 @@
 
         function renderForm() {
             const pro = professionals.find(p => p.id === flow.proId);
+            const service = (pro.services || []).find(s => s.id === flow.serviceId);
             const dParts = flow.date.split('-').map(Number);
             const d = new Date(dParts[0], dParts[1] - 1, dParts[2]);
             const wd = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+            
+            const sName = service ? service.name : 'não especificado';
+            const sPrice = service ? service.price : (pro.price || 0);
+
             document.getElementById('summaryBox').innerHTML =
-                `<div><b>Profissional:</b> ${escapeHTML(pro.name)} · ${escapeHTML(pro.role)}</div>
-     <div><b>Dia:</b> ${d.getDate()} de ${['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][d.getMonth()]} (${wd[d.getDay()]})</div>
-     <div><b>Horário:</b> ${escapeHTML(flow.time)}</div>`;
+                `<div><b>Profissional:</b> ${escapeHTML(pro.name)} (${escapeHTML(pro.role)})</div>
+                 <div><b>Serviço:</b> ${escapeHTML(sName)} · <b>${money(sPrice)}</b></div>
+                 <div><b>Dia:</b> ${d.getDate()} de ${['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][d.getMonth()]} (${wd[d.getDay()]})</div>
+                 <div><b>Horário:</b> ${escapeHTML(flow.time)}</div>`;
+                 
+            document.getElementById('cService').value = sName;
         }
 
         async function confirmBooking() {
             const btn = document.getElementById('btnConfirmBooking');
             const name = document.getElementById('cName').value.trim();
             const phone = document.getElementById('cPhone').value.trim();
-            const service = document.getElementById('cService').value.trim();
-            if (!name || !phone) { showToast('Preencha nome e WhatsApp'); return; }
+            if (!name || !phone) { showToast('Preencha seu nome e WhatsApp'); return; }
 
             btn.disabled = true;
             btn.textContent = 'Enviando...';
 
             const pro = professionals.find(p => p.id === flow.proId);
+            const serviceObj = (pro.services || []).find(s => s.id === flow.serviceId);
+            const finalService = serviceObj ? serviceObj.name : (document.getElementById('cService').value.trim() || 'Serviço');
+            const finalPrice = serviceObj ? serviceObj.price : (pro.price || 0);
+
             const booking = {
                 id: 'b' + Date.now(), proId: pro.id, date: flow.date, time: flow.time,
-                clientName: name, clientPhone: phone, service: service || 'não especificado',
-                price: pro.price || 0, createdAt: new Date().toISOString()
+                clientName: name, clientPhone: phone, service: finalService,
+                price: finalPrice, createdAt: new Date().toISOString()
             };
 
             try {
@@ -1866,7 +2004,7 @@
                 const dParts = flow.date.split('-').map(Number);
                 const dataFmt = `${String(dParts[2]).padStart(2, '0')}/${String(dParts[1]).padStart(2, '0')}`;
                 const msg = `Olá ${pro.name}! Vim pelo Glam e quero agendar:%0A%0A` +
-                    `Serviço: ${encodeURIComponent(service || 'a combinar')}%0A` +
+                    `Serviço: ${encodeURIComponent(finalService)} (${money(finalPrice)})%0A` +
                     `Dia: ${dataFmt}%0A` +
                     `Horário: ${flow.time}%0A` +
                     `Nome: ${encodeURIComponent(name)}%0A` +
@@ -1882,7 +2020,6 @@
                 document.getElementById('step-done').dataset.show = '1';
                 renderClientFlow();
 
-                // Redireciona diretamente para o aplicativo/site do WhatsApp sem abrir aba em branco
                 window.location.href = waUrl;
             } catch (err) {
                 showToast(err.message || 'Erro ao realizar agendamento.');
@@ -1914,18 +2051,19 @@
             if (professionals.length === 0) { wrap.innerHTML = '<div class="empty">Nenhuma profissional cadastrada.</div>'; return; }
             wrap.innerHTML = professionals.map(p => {
                 const link = `${location.origin}${location.pathname}?pro=${p.id}`;
+                const servCount = (p.services || []).length;
                 return `
     <div class="pro-list-item">
       <div class="pro-mini">
         ${renderAvatarHtml(p)}
         <div>
           <div class="pro-mini-name">${escapeHTML(p.name)}</div>
-          <div class="pro-mini-role">${escapeHTML(p.role)}</div>
+          <div class="pro-mini-role">${escapeHTML(p.role)} · ${servCount} serviço(s)</div>
           <div class="link-box"><input readonly value="${escapeHTML(link)}"><button onclick="copyLink('${escapeHTML(link)}', this)">Copiar link</button></div>
         </div>
       </div>
       <div class="row-actions">
-        <button onclick="openProModal('${escapeHTML(p.id)}')">Editar Horários</button>
+        <button onclick="openProModal('${escapeHTML(p.id)}')">Editar / Serviços</button>
         <button onclick="deletePro('${escapeHTML(p.id)}')">Remover</button>
       </div>
     </div>`;
@@ -1947,7 +2085,7 @@
     <tr>
       <td><b>${escapeHTML(b.clientName)}</b></td>
       <td>${escapeHTML(b.clientPhone)}</td>
-      <td>${escapeHTML(b.service)}</td>
+      <td>${escapeHTML(b.service)} (${money(b.price)})</td>
       <td>${escapeHTML(proName)}</td>
       <td>${dataFmt} às ${escapeHTML(b.time)}</td>
       <td><button onclick="deleteBookingAdmin('${escapeHTML(b.id)}')" style="background:none;border:none;color:#7a2e2e;font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer">Cancelar</button></td>
@@ -1976,6 +2114,48 @@
         }
 
         /* ============================================================
+           GESTOR DE SERVIÇOS DA PROFISSIONAL
+           ============================================================ */
+        function renderProServicesList() {
+            const list = document.getElementById('proServicesList');
+            if (!currentProServices || !currentProServices.length) {
+                list.innerHTML = '<span style="font-size:12px; color:var(--ink-40)">Nenhum serviço cadastrado ainda.</span>';
+                return;
+            }
+            list.innerHTML = currentProServices.map(s => `
+                <div style="display:flex; align-items:center; justify-content:space-between; background:var(--white); border:1px solid var(--ink-15); padding:8px 12px; border-radius:8px; font-size:13px;">
+                    <div><b>${escapeHTML(s.name)}</b> — <span style="color:var(--ink-60)">${money(s.price)}</span></div>
+                    <button type="button" onclick="removeServiceFromPro('${escapeHTML(s.id)}')" style="background:none; border:none; color:#7a2e2e; cursor:pointer; font-weight:bold; font-size:12px;">✕ Remover</button>
+                </div>
+            `).join('');
+        }
+
+        function addServiceToPro() {
+            const nameInp = document.getElementById('newServiceName');
+            const priceInp = document.getElementById('newServicePrice');
+            const name = nameInp.value.trim();
+            const price = Number(priceInp.value) || 0;
+
+            if (!name) { showToast('Informe o nome do serviço'); return; }
+
+            currentProServices.push({
+                id: 's' + Date.now() + Math.floor(Math.random() * 100),
+                name,
+                price
+            });
+
+            nameInp.value = '';
+            priceInp.value = '';
+            renderProServicesList();
+            showToast('Serviço adicionado!');
+        }
+
+        function removeServiceFromPro(sId) {
+            currentProServices = currentProServices.filter(s => s.id !== sId);
+            renderProServicesList();
+        }
+
+        /* ============================================================
            EDITOR DE HORÁRIOS CUSTOMIZADOS POR DIA
            ============================================================ */
         function initDaySlotsState(schedule) {
@@ -1987,7 +2167,6 @@
                 } else if (cfg && cfg.on && cfg.start && cfg.end) {
                     daySlotsState[w.k] = genSlots(schedule, w.k);
                 } else if (!schedule) {
-                    // Padrão inicial para nova profissional (09:00 até 18:00) nos dias úteis
                     if (['seg', 'ter', 'qua', 'qui', 'sex'].includes(w.k)) {
                         daySlotsState[w.k] = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
                     } else {
@@ -2066,7 +2245,6 @@
     </div>`;
             }).join('');
 
-            // Renderiza as tags de horários existentes para cada dia
             WEEKDAYS.forEach(w => renderDaySlotsTags(w.k));
         }
 
@@ -2131,7 +2309,10 @@
             document.getElementById('proAvatarInput').value = '';
             
             currentBlockedDates = p && p.blockedDates ? [...p.blockedDates] : [];
+            currentProServices = p && p.services ? JSON.parse(JSON.stringify(p.services)) : [];
+            
             renderBlockedDatesTags();
+            renderProServicesList();
 
             const prev = document.getElementById('avatarPreview');
             if (p && p.avatarUrl) {
@@ -2177,13 +2358,14 @@
                 });
 
                 schedule.blockedDates = currentBlockedDates;
+                schedule.services = currentProServices;
 
                 let proObj;
                 if (id) {
                     proObj = professionals.find(x => x.id === id);
-                    Object.assign(proObj, { name, role, phone, avatarUrl, schedule, blockedDates: currentBlockedDates });
+                    Object.assign(proObj, { name, role, phone, avatarUrl, schedule, services: currentProServices, blockedDates: currentBlockedDates });
                 } else {
-                    proObj = { id: 'p' + Date.now(), name, role, phone, avatarUrl, schedule, blockedDates: currentBlockedDates };
+                    proObj = { id: 'p' + Date.now(), name, role, phone, avatarUrl, schedule, services: currentProServices, blockedDates: currentBlockedDates };
                     professionals.push(proObj);
                 }
 
