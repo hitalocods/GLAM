@@ -1265,12 +1265,16 @@
             <div id="step-done" class="step-panel" style="display:none">
                 <div class="confirm-screen">
                     <div class="mark">✓</div>
-                    <div class="section-title" style="margin-bottom:10px">Agendamento enviado</div>
-                    <p style="color:var(--ink-60); font-size:14.5px; line-height:1.7; margin-bottom:26px">
-                        Sua solicitação foi encaminhada para o WhatsApp da profissional. O horário fica reservado assim
-                        que ela confirmar.
+                    <div class="section-title" style="margin-bottom:10px">Agendamento registrado!</div>
+                    <p style="color:var(--ink-60); font-size:14.5px; line-height:1.7; margin-bottom:22px">
+                        Sua solicitação foi salva no sistema. Clique no botão abaixo se o WhatsApp não abrir automaticamente:
                     </p>
-                    <button class="btn ghost" onclick="resetFlow()">Fazer novo agendamento</button>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <a id="btnOpenWhatsapp" href="#" target="_blank" class="btn" style="justify-content:center; text-align:center;">
+                            📲 Abrir WhatsApp da Profissional
+                        </a>
+                        <button class="btn ghost" onclick="resetFlow()">Fazer novo agendamento</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1833,10 +1837,19 @@
                     `Horário: ${flow.time}%0A` +
                     `Nome: ${encodeURIComponent(name)}%0A` +
                     `Meu WhatsApp: ${encodeURIComponent(phone)}`;
-                window.open(`https://wa.me/${pro.phone.replace(/\D/g, '')}?text=${msg}`, '_blank');
+                
+                const waUrl = `https://wa.me/${pro.phone.replace(/\D/g, '')}?text=${msg}`;
+                
+                const btnWa = document.getElementById('btnOpenWhatsapp');
+                if (btnWa) {
+                    btnWa.href = waUrl;
+                }
 
                 document.getElementById('step-done').dataset.show = '1';
                 renderClientFlow();
+
+                // Redireciona diretamente para o aplicativo/site do WhatsApp sem abrir aba em branco
+                window.location.href = waUrl;
             } catch (err) {
                 showToast(err.message || 'Erro ao realizar agendamento.');
             } finally {
