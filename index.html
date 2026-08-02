@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glam — Agendamento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ice: #FAF9F6;
+            --ice-2: #F1EFEA;
+            --white: #FFFFFF;
+            --ink: #121212;
+            --ink-85: rgba(18, 18, 18, .85);
+            --ink-60: rgba(18, 18, 18, .6);
+            --ink-40: rgba(18, 18, 18, .38);
+            --ink-15: rgba(18, 18, 18, .13);
+            --ink-08: rgba(18, 18, 18, .07);
+            --radius: 2px;
+            --serif: 'Fraunces', serif;
+            --sans: 'Manrope', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--ice);
+            color: var(--ink);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: .001s !important;
+                transition-duration: .001s !important;
+            }
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        /* ===== Top bar ===== */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px clamp(20px, 5vw, 64px);
+            background: rgba(250, 249, 246, .86);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--ink-08);
+        }
+
+        .wordmark {
+            font-family: var(--serif);
+            font-weight: 500;
+            font-size: 22px;
+            letter-spacing: .06em;
+        }
+
+        .wordmark em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .topnav {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            font-size: 12.5px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-60);
+        }
+
+        .topnav button {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: inherit;
+            letter-spacing: inherit;
+            text-transform: inherit;
+            padding: 0;
+            position: relative;
+        }
+
+        .topnav button.active {
+            color: var(--ink);
+        }
+
+        .topnav button.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -6px;
+            height: 1px;
+            background: var(--ink);
+        }
+
+        /* ===== Views ===== */
+        .view {
+            display: none;
+            animation: fadeIn .5s ease;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Hero (client) ===== */
+        .hero {
+            padding: 74px clamp(20px, 5vw, 64px) 30px;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            font-size: 11.5px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .eyebrow::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--ink-15);
+        }
+
+        .hero h1 {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: clamp(38px, 6vw, 68px);
+            line-height: 1.02;
+            letter-spacing: -.01em;
+            max-width: 14ch;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            font-weight: 400;
+            color: var(--ink-60);
+        }
+
+        .categories {
+            margin-top: 34px;
+            font-size: 12.5px;
+            letter-spacing: .24em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 22px;
+        }
+
+        .categories span:not(:last-child)::after {
+            content: '·';
+            margin-left: 22px;
+            color: var(--ink-15);
+        }
+
+        /* ===== Stepper ===== */
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 clamp(20px, 5vw, 64px) 40px;
+            overflow-x: auto;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            margin-right: 34px;
+            white-space: nowrap;
+        }
+
+        .step-num {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 17px;
+            color: var(--ink-40);
+            min-width: 20px;
+        }
+
+        .step-item.done .step-num,
+        .step-item.current .step-num {
+            color: var(--ink);
+        }
+
+        .step-label {
+            font-size: 12px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+        }
+
+        .step-item.done .step-label,
+        .step-item.current .step-label {
+            color: var(--ink-85);
+        }
+
+        .step-item.current .step-label {
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: 2px;
+        }
+
+        .step-sep {
+            width: 26px;
+            height: 1px;
+            background: var(--ink-15);
+            margin-right: 34px;
+        }
+
+        /* ===== Section shell ===== */
+        .section {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 clamp(20px, 5vw, 64px) 100px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 26px;
+        }
+
+        .back-link {
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-60);
+            border-bottom: 1px solid var(--ink-15);
+            padding-bottom: 2px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: var(--ink);
+            border-color: var(--ink);
+        }
+
+        /* ===== Professional cards ===== */
+        .pro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1px;
+            background: var(--ink-08);
+            border: 1px solid var(--ink-08);
+        }
+
+        .pro-card {
+            background: var(--white);
+            padding: 26px 20px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: background .25s ease;
+            border: none;
+            width: 100%;
+        }
+
+        .pro-card:hover {
+            background: var(--ice-2);
+        }
+
+        .pro-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--ink);
+            color: var(--ice);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--serif);
+            font-size: 16px;
+            font-style: italic;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .pro-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pro-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .pro-role {
+            font-size: 11.5px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+        }
+
+        .pro-cta {
+            font-size: 11.5px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-60);
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pro-cta svg {
+            width: 11px;
+            height: 11px;
+            transition: transform .2s ease;
+        }
+
+        .pro-card:hover .pro-cta svg {
+            transform: translateX(3px);
+        }
+
+        .empty {
+            padding: 60px 24px;
+            text-align: center;
+            color: var(--ink-40);
+            font-size: 13.5px;
+            border: 1px dashed var(--ink-15);
+            width: 100%;
+        }
+
+        /* ===== Days / times ===== */
+        .day-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            border: 1px solid var(--ink-15);
+            background: var(--white);
+            padding: 14px 18px;
+            min-width: 98px;
+            text-align: center;
+            transition: all .18s ease;
+        }
+
+        .chip .d1 {
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+        }
+
+        .chip .d2 {
+            font-family: var(--serif);
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .chip:hover {
+            border-color: var(--ink-40);
+        }
+
+        .chip.selected {
+            background: var(--ink);
+            border-color: var(--ink);
+        }
+
+        .chip.selected .d1,
+        .chip.selected .d2 {
+            color: var(--ice);
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+            gap: 10px;
+        }
+
+        .time-chip {
+            border: 1px solid var(--ink-15);
+            background: var(--white);
+            padding: 13px 10px;
+            text-align: center;
+            font-size: 14px;
+            transition: all .18s ease;
+        }
+
+        .time-chip:hover {
+            border-color: var(--ink-40);
+        }
+
+        .time-chip.selected {
+            background: var(--ink);
+            color: var(--ice);
+            border-color: var(--ink);
+        }
+
+        .time-chip.taken {
+            opacity: .3;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ===== Form ===== */
+        .form-wrap {
+            max-width: 520px;
+        }
+
+        .field {
+            margin-bottom: 22px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11.5px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            margin-bottom: 8px;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--ink-15);
+            background: transparent;
+            padding: 10px 2px;
+            font-size: 16px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--ink);
+        }
+
+        .summary-box {
+            border: 1px solid var(--ink-15);
+            padding: 22px;
+            margin: 26px 0 30px;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .summary-box b {
+            font-weight: 600;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--ink);
+            color: var(--ice);
+            border: 1px solid var(--ink);
+            padding: 15px 28px;
+            font-size: 12.5px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            transition: all .2s ease;
+        }
+
+        .btn:hover {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn.ghost {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .btn.ghost:hover {
+            background: var(--ink);
+            color: var(--ice);
+        }
+
+        .btn:disabled {
+            opacity: .35;
+            pointer-events: none;
+        }
+
+        .confirm-screen {
+            max-width: 520px;
+            padding: 20px 0;
+        }
+
+        .confirm-screen .mark {
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 44px;
+            margin-bottom: 18px;
+        }
+
+        /* ===== Admin ===== */
+        .admin-gate {
+            max-width: 380px;
+            margin: 110px auto;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .admin-gate .field input {
+            text-align: center;
+            font-size: 20px;
+            letter-spacing: .3em;
+        }
+
+        .admin-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 44px clamp(20px, 5vw, 64px) 100px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid var(--ink-08);
+            margin-bottom: 36px;
+        }
+
+        .admin-tab {
+            padding: 12px 0;
+            font-size: 12px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            border-bottom: 1px solid transparent;
+            margin-bottom: -1px;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .admin-tab.active {
+            color: var(--ink);
+            border-bottom-color: var(--ink);
+        }
+
+        .card-panel {
+            border: 1px solid var(--ink-08);
+            background: var(--white);
+            padding: 26px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media(max-width:720px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pro-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--ink-08);
+        }
+
+        .pro-list-item:first-child {
+            padding-top: 0;
+        }
+
+        .pro-mini {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .pro-mini .pro-avatar {
+            width: 36px;
+            height: 36px;
+            font-size: 13px;
+        }
+
+        .pro-mini-name {
+            font-size: 14.5px;
+            font-weight: 600;
+        }
+
+        .pro-mini-role {
+            font-size: 11.5px;
+            color: var(--ink-40);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 16px;
+            font-size: 11.5px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-60);
+        }
+
+        .row-actions button {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        .row-actions button:hover {
+            color: var(--ink);
+            text-decoration: underline;
+        }
+
+        .week-editor {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .day-toggle {
+            border: 1px solid var(--ink-15);
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .day-toggle .dt-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .dt-head label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .day-toggle input[type=checkbox] {
+            accent-color: var(--ink);
+            width: 15px;
+            height: 15px;
+        }
+
+        .dt-times {
+            display: flex;
+            gap: 6px;
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .dt-times.on {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .dt-times input {
+            width: 100%;
+            border: 1px solid var(--ink-15);
+            padding: 6px;
+            font-size: 12.5px;
+            background: var(--ice);
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1px;
+            background: var(--ink-08);
+            border: 1px solid var(--ink-08);
+            margin-bottom: 34px;
+        }
+
+        .stat-box {
+            background: var(--white);
+            padding: 24px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-family: var(--serif);
+            font-size: 30px;
+        }
+
+        .stat-value.neg {
+            color: #7a2e2e;
+        }
+
+        .bar-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 90px;
+            align-items: center;
+            gap: 16px;
+            font-size: 13.5px;
+        }
+
+        .bar-track {
+            height: 8px;
+            background: var(--ink-08);
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--ink);
+        }
+
+        .bar-amt {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        table.exp-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table.exp-table th {
+            text-align: left;
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--ink-40);
+            font-weight: 500;
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--ink-15);
+        }
+
+        table.exp-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--ink-08);
+        }
+
+        .link-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .link-box input {
+            flex: 1;
+            border: 1px solid var(--ink-15);
+            padding: 9px 10px;
+            font-size: 12.5px;
+            background: var(--ice);
+            color: var(--ink-60);
+        }
+
+        .link-box button {
+            border: 1px solid var(--ink-15);
+            background: var(--white);
+            padding: 9px 14px;
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .link-box button:hover {
+            border-color: var(--ink);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--ink);
+            color: var(--ice);
+            padding: 14px 22px;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all .3s ease;
+            z-index: 200;
+            letter-spacing: .02em;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .modal-bg {
+            position: fixed;
+            inset: 0;
+            background: rgba(18, 18, 18, .4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-bg.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--ice);
+            border: 1px solid var(--ink-15);
+            padding: 34px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 86vh;
+            overflow: auto;
+        }
+
+        .modal h3 {
+            font-family: var(--serif);
+            font-size: 22px;
+            margin-bottom: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .avatar-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 6px;
+        }
+
+        .blocked-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--ink-08);
+            border: 1px solid var(--ink-15);
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 2px;
+        }
+
+        .blocked-tag button {
+            background: none;
+            border: none;
+            color: #7a2e2e;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            line-height: 1;
+        }
+
+        /* ===== Mobile Responsiveness Enhancements ===== */
+        @media (max-width: 640px) {
+            .topbar {
+                padding: 14px 18px;
+            }
+
+            .wordmark {
+                font-size: 19px;
+            }
+
+            .topnav {
+                gap: 16px;
+                font-size: 11px;
+            }
+
+            .hero {
+                padding: 36px 18px 20px;
+            }
+
+            .hero h1 {
+                font-size: clamp(28px, 7vw, 42px);
+                max-width: 100%;
+            }
+
+            .categories {
+                margin-top: 20px;
+                font-size: 11px;
+                gap: 6px 14px;
+            }
+
+            .categories span:not(:last-child)::after {
+                margin-left: 14px;
+            }
+
+            .stepper {
+                padding: 0 18px 24px;
+            }
+
+            .step-item {
+                margin-right: 14px;
+                gap: 6px;
+            }
+
+            .step-sep {
+                width: 14px;
+                margin-right: 14px;
+            }
+
+            .section {
+                padding: 0 18px 60px;
+            }
+
+            .section-head {
+                margin-bottom: 20px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+
+            .pro-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .pro-card {
+                padding: 18px 14px;
+                gap: 10px;
+            }
+
+            .pro-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .pro-name {
+                font-size: 14px;
+            }
+
+            .pro-role {
+                font-size: 10.5px;
+            }
+
+            .day-row {
+                gap: 8px;
+            }
+
+            .chip {
+                min-width: 72px;
+                padding: 10px 12px;
+            }
+
+            .chip .d1 {
+                font-size: 10px;
+            }
+
+            .chip .d2 {
+                font-size: 17px;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+                gap: 8px;
+            }
+
+            .time-chip {
+                padding: 11px 6px;
+                font-size: 13px;
+            }
+
+            .form-wrap {
+                max-width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 20px;
+                font-size: 12px;
+            }
+
+            .admin-shell {
+                padding: 24px 18px 60px;
+            }
+
+            .admin-tabs {
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .admin-tab {
+                font-size: 11px;
+                padding: 10px 0;
+            }
+
+            .modal-bg {
+                padding: 12px;
+            }
+
+            .modal {
+                padding: 22px 18px;
+                max-height: 92vh;
+                border-radius: 4px;
+            }
+
+            .modal h3 {
+                font-size: 19px;
+                margin-bottom: 18px;
+            }
+
+            .week-editor {
+                grid-template-columns: 1fr;
+            }
+
+            .dt-times {
+                flex-wrap: wrap;
+            }
+
+            .dt-times input {
+                min-width: 70px;
+            }
+
+            .stat-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-box {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .bar-row {
+                grid-template-columns: 100px 1fr 70px;
+                font-size: 12px;
+                gap: 10px;
+            }
+
+            .link-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .link-box button {
+                width: 100%;
+            }
+
+            .pro-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .row-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="wordmark">GL<em>a</em>M</div>
+        <div class="topnav">
+            <button id="navCliente" class="active" onclick="goto('cliente')">Agendar</button>
+            <button id="navAdmin" onclick="goto('adminGate')">Studio</button>
+        </div>
+    </div>
+
+    <!-- ============ CLIENTE ============ -->
+    <div id="view-cliente" class="view active">
+
+        <div class="hero">
+            <div class="eyebrow"><span>Estúdio de beleza</span></div>
+            <h1>Seu horário, <em>reservado em segundos.</em></h1>
+            <div class="categories"><span>Cabelo</span><span>Unha</span><span>Make</span><span>Cílios</span></div>
+        </div>
+
+        <div class="stepper" id="stepper"></div>
+
+        <div class="section">
+            <!-- STEP 1: profissional -->
+            <div id="step-pro" class="step-panel">
+                <div class="section-head">
+                    <div class="section-title">Escolha a profissional</div>
+                </div>
+                <div id="proGrid" class="pro-grid"></div>
+            </div>
+
+            <!-- STEP 2: dia -->
+            <div id="step-day" class="step-panel" style="display:none">
+                <div class="section-head">
+                    <div class="section-title">Escolha o dia</div>
+                    <a class="back-link" onclick="backTo('pro')">← trocar profissional</a>
+                </div>
+                <div id="dayRow" class="day-row"></div>
+            </div>
+
+            <!-- STEP 3: horario -->
+            <div id="step-time" class="step-panel" style="display:none">
+                <div class="section-head">
+                    <div class="section-title">Escolha o horário</div>
+                    <a class="back-link" onclick="backTo('day')">← trocar dia</a>
+                </div>
+                <div id="timeGrid" class="time-grid"></div>
+            </div>
+
+            <!-- STEP 4: dados -->
+            <div id="step-form" class="step-panel" style="display:none">
+                <div class="section-head">
+                    <div class="section-title">Seus dados</div>
+                    <a class="back-link" onclick="backTo('time')">← trocar horário</a>
+                </div>
+                <div class="form-wrap">
+                    <div class="summary-box" id="summaryBox"></div>
+                    <div class="field"><label>Nome completo</label><input id="cName" placeholder="Seu nome"></div>
+                    <div class="field"><label>WhatsApp</label><input id="cPhone" placeholder="(86) 90000-0000"></div>
+                    <div class="field"><label>Serviço desejado</label><input id="cService"
+                            placeholder="Ex.: escova, unha em gel, mega hair..."></div>
+                    <button class="btn" id="btnConfirmBooking" onclick="confirmBooking()">Confirmar e enviar no WhatsApp</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: confirmação -->
+            <div id="step-done" class="step-panel" style="display:none">
+                <div class="confirm-screen">
+                    <div class="mark">✓</div>
+                    <div class="section-title" style="margin-bottom:10px">Agendamento enviado</div>
+                    <p style="color:var(--ink-60); font-size:14.5px; line-height:1.7; margin-bottom:26px">
+                        Sua solicitação foi encaminhada para o WhatsApp da profissional. O horário fica reservado assim
+                        que ela confirmar.
+                    </p>
+                    <button class="btn ghost" onclick="resetFlow()">Fazer novo agendamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ADMIN GATE ============ -->
+    <div id="view-adminGate" class="view">
+        <div class="admin-gate">
+            <div class="eyebrow" style="justify-content:center"><span>Acesso restrito</span></div>
+            <div class="section-title" style="margin-bottom:26px">Painel do studio</div>
+            <div class="field"><input id="adminPass" placeholder="•••••" type="password"
+                    onkeydown="if(event.key==='Enter')tryAdminLogin()"></div>
+            <button class="btn" style="width:100%; justify-content:center" onclick="tryAdminLogin()">Entrar</button>
+            <p style="margin-top:16px; font-size:12px; color:var(--ink-40)">senha padrão: glam</p>
+        </div>
+    </div>
+
+    <!-- ============ ADMIN ============ -->
+    <div id="view-admin" class="view">
+        <div class="admin-shell">
+            <div class="section-head">
+                <div class="section-title">Painel do studio</div>
+                <a class="back-link" onclick="goto('cliente')">← ver como cliente</a>
+            </div>
+            <div class="admin-tabs">
+                <button class="admin-tab active" id="tabProf" onclick="adminTab('prof')">Profissionais</button>
+                <button class="admin-tab" id="tabBookings" onclick="adminTab('bookings')">Agendamentos</button>
+                <button class="admin-tab" id="tabDash" onclick="adminTab('dash')">Dashboard</button>
+            </div>
+
+            <!-- Profissionais -->
+            <div id="admin-prof">
+                <div class="section-head">
+                    <div style="font-size:13px; color:var(--ink-40)">Cadastre, defina agenda, bloqueie folgas e gere o link de cada profissional</div>
+                    <button class="btn" onclick="openProModal()">+ Nova profissional</button>
+                </div>
+                <div class="card-panel" id="proAdminList"></div>
+            </div>
+
+            <!-- Lista de Agendamentos -->
+            <div id="admin-bookings" style="display:none">
+                <div class="section-head">
+                    <div style="font-size:13px; color:var(--ink-40)">Histórico de agendamentos realizados pelos clientes</div>
+                </div>
+                <div class="card-panel" style="overflow-x:auto;">
+                    <table class="exp-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>WhatsApp</th>
+                                <th>Serviço</th>
+                                <th>Profissional</th>
+                                <th>Data & Horário</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsAdminBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="admin-dash" style="display:none">
+                <div class="stat-row" id="statRow"></div>
+                <div class="grid-2">
+                    <div class="card-panel">
+                        <div class="section-title" style="font-size:17px; margin-bottom:20px">Faturamento por profissional</div>
+                        <div class="bar-list" id="barList"></div>
+                    </div>
+                    <div class="card-panel">
+                        <div class="section-title" style="font-size:17px; margin-bottom:20px">Despesas</div>
+                        <div class="field" style="display:flex; gap:8px; margin-bottom:18px">
+                            <input id="expDesc" placeholder="Descrição"
+                                style="border:1px solid var(--ink-15); padding:9px 10px; font-size:13px;">
+                            <input id="expVal" placeholder="Valor" type="number"
+                                style="width:90px; border:1px solid var(--ink-15); padding:9px 10px; font-size:13px;">
+                            <button class="btn" style="padding:9px 16px" onclick="addExpense()">+</button>
+                        </div>
+                        <table class="exp-table">
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="expBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ MODAL: editar profissional ============ -->
+    <div class="modal-bg" id="proModalBg">
+        <div class="modal">
+            <h3 id="proModalTitle">Nova profissional</h3>
+            <input type="hidden" id="proId">
+            <div class="field"><label>Nome</label><input id="proName"></div>
+            <div class="field"><label>Função</label><input id="proRole"
+                    placeholder="Cabeleireira, Manicure, Maquiadora, Designer de cílios..."></div>
+            <div class="field"><label>WhatsApp (só números, com DDD)</label><input id="proPhone"
+                    placeholder="86900000000"></div>
+            <div class="field"><label>Valor médio do serviço (R$)</label><input id="proPrice" type="number"
+                    placeholder="80"></div>
+            <div class="field">
+                <label>Foto de Perfil (Vercel Blob)</label>
+                <div class="avatar-preview-box">
+                    <div class="pro-avatar" id="avatarPreview">P</div>
+                    <input type="file" id="proAvatarInput" accept="image/*" style="font-size:12px;" onchange="previewAvatar(this)">
+                    <input type="hidden" id="proAvatarUrl">
+                </div>
+            </div>
+            
+            <div class="field">
+                <label>Dias da semana de atendimento</label>
+                <div class="week-editor" id="weekEditor"></div>
+            </div>
+
+            <!-- Bloqueio de Datas Específicas -->
+            <div class="field" style="margin-top:24px; padding-top:18px; border-top:1px solid var(--ink-15);">
+                <label>Bloquear datas específicas (folgas / feriados)</label>
+                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <input type="date" id="blockDateInput" style="flex:1; border:1px solid var(--ink-15); padding:8px 10px; font-size:13px; background:var(--ice);">
+                    <button type="button" class="btn" style="padding:8px 14px; font-size:11px;" onclick="addBlockedDate()">+ Bloquear Data</button>
+                </div>
+                <div id="blockedDatesList" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn" id="btnSavePro" onclick="saveProfessional()">Salvar</button>
+                <button class="btn ghost" onclick="closeProModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ============================================================
+           HELPERS & SANITIZATION
+           ============================================================ */
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function fmtDate(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function money(n) { 
+            return 'R$ ' + (Number(n) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+        }
+
+        function renderAvatarHtml(p) {
+            if (p.avatarUrl) {
+                return `<div class="pro-avatar"><img src="${escapeHTML(p.avatarUrl)}" alt="${escapeHTML(p.name)}"></div>`;
+            }
+            return `<div class="pro-avatar">${escapeHTML(p.name ? p.name.charAt(0) : '?')}</div>`;
+        }
+
+        /* ============================================================
+           DATA LAYER — Vercel API + Neon DB + LocalStorage Fallback
+           ============================================================ */
+        const WEEKDAYS = [
+            { k: 'seg', label: 'Seg' }, { k: 'ter', label: 'Ter' }, { k: 'qua', label: 'Qua' },
+            { k: 'qui', label: 'Qui' }, { k: 'sex', label: 'Sex' }, { k: 'sab', label: 'Sáb' }, { k: 'dom', label: 'Dom' }
+        ];
+
+        let professionals = [];
+        let bookings = [];
+        let expenses = [];
+        let isApiMode = true;
+        let currentBlockedDates = [];
+
+        function seedPros() {
+            return [
+                {
+                    id: 'p1', name: 'Larissa Nunes', role: 'Cabeleireira', phone: '5586999990001', price: 120, avatarUrl: '', blockedDates: [],
+                    schedule: { seg: { on: true, start: '09:00', end: '18:00', interval: 60 }, ter: { on: true, start: '09:00', end: '18:00', interval: 60 }, qua: { on: true, start: '09:00', end: '18:00', interval: 60 }, qui: { on: true, start: '09:00', end: '18:00', interval: 60 }, sex: { on: true, start: '09:00', end: '18:00', interval: 60 }, sab: { on: false }, dom: { on: false } }
+                },
+                {
+                    id: 'p2', name: 'Bruna Alves', role: 'Designer de cílios', phone: '5586999990002', price: 90, avatarUrl: '', blockedDates: [],
+                    schedule: { seg: { on: false }, ter: { on: true, start: '10:00', end: '17:00', interval: 90 }, qua: { on: true, start: '10:00', end: '17:00', interval: 90 }, qui: { on: true, start: '10:00', end: '17:00', interval: 90 }, sex: { on: true, start: '10:00', end: '17:00', interval: 90 }, sab: { on: true, start: '09:00', end: '14:00', interval: 90 }, dom: { on: false } }
+                },
+            ];
+        }
+
+        async function loadAll() {
+            try {
+                fetch('/api/init').catch(() => {});
+            } catch(e) {}
+
+            try {
+                const r = await fetch('/api/professionals');
+                const json = await r.json();
+                if (json.ok && json.data) {
+                    professionals = json.data.map(p => ({
+                        ...p,
+                        blockedDates: p.blockedDates || (p.schedule && p.schedule.blockedDates) || []
+                    }));
+                } else {
+                    isApiMode = false;
+                    loadLocalData();
+                    return;
+                }
+            } catch (e) {
+                isApiMode = false;
+                loadLocalData();
+                return;
+            }
+
+            try {
+                const r = await fetch('/api/bookings');
+                const json = await r.json();
+                if (json.ok && json.data) bookings = json.data;
+            } catch (e) { bookings = []; }
+
+            try {
+                const r = await fetch('/api/expenses');
+                const json = await r.json();
+                if (json.ok && json.data) expenses = json.data;
+            } catch (e) { expenses = []; }
+        }
+
+        function loadLocalData() {
+            try { const p = localStorage.getItem('professionals'); professionals = p ? JSON.parse(p) : seedPros(); } catch(e) { professionals = seedPros(); }
+            try { const b = localStorage.getItem('bookings'); bookings = b ? JSON.parse(b) : []; } catch(e) { bookings = []; }
+            try { const ex = localStorage.getItem('expenses'); expenses = ex ? JSON.parse(ex) : []; } catch(e) { expenses = []; }
+        }
+
+        async function saveProfessionalDb(proObj) {
+            if (isApiMode) {
+                try {
+                    const r = await fetch('/api/professionals', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(proObj)
+                    });
+                    const json = await r.json();
+                    if (!json.ok) console.error('Erro API professional:', json.error);
+                } catch(e) { console.error('Erro de rede pro API:', e); }
+            }
+            localStorage.setItem('professionals', JSON.stringify(professionals));
+        }
+
+        async function deleteProfessionalDb(id) {
+            if (isApiMode) {
+                try {
+                    await fetch(`/api/professionals?id=${id}`, { method: 'DELETE' });
+                } catch(e) {}
+            }
+            localStorage.setItem('professionals', JSON.stringify(professionals));
+        }
+
+        async function saveBookingDb(bookingObj) {
+            if (isApiMode) {
+                const r = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingObj)
+                });
+                const json = await r.json();
+                if (r.status === 409 || !json.ok) {
+                    throw new Error(json.error || 'Erro ao salvar agendamento no banco.');
+                }
+            }
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+        }
+
+        async function deleteBookingDb(id) {
+            if (isApiMode) {
+                try {
+                    await fetch(`/api/bookings?id=${id}`, { method: 'DELETE' });
+                } catch(e) {}
+            }
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+        }
+
+        async function saveExpenseDb(expenseObj) {
+            if (isApiMode) {
+                try {
+                    await fetch('/api/expenses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(expenseObj)
+                    });
+                } catch(e) {}
+            }
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+        }
+
+        async function deleteExpenseDb(id) {
+            if (isApiMode) {
+                try {
+                    await fetch(`/api/expenses?id=${id}`, { method: 'DELETE' });
+                } catch(e) {}
+            }
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+        }
+
+        async function uploadBlobFile(file) {
+            if (!file) return '';
+            try {
+                const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+                    method: 'POST',
+                    body: file
+                });
+                const json = await res.json();
+                if (json.ok && json.url) return json.url;
+                throw new Error(json.error || 'Erro no Vercel Blob');
+            } catch(e) {
+                console.warn('Fallback upload avatar DataURL local:', e);
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => resolve(evt.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        /* ============================================================
+           NAV
+           ============================================================ */
+        function goto(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            document.getElementById('navCliente').classList.toggle('active', id === 'cliente');
+            document.getElementById('navAdmin').classList.toggle('active', id === 'adminGate' || id === 'admin');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (id === 'admin') { 
+                renderAdminPros(); 
+                renderAdminBookings();
+                renderDashboard(); 
+            }
+        }
+
+        function tryAdminLogin() {
+            const v = document.getElementById('adminPass').value;
+            if (v === 'glam') { goto('admin'); }
+            else showToast('Senha incorreta');
+        }
+
+        /* ============================================================
+           CLIENT FLOW STATE
+           ============================================================ */
+        let flow = { proId: null, date: null, time: null };
+        const STEPS = [
+            { k: 'pro', label: 'Profissional' }, { k: 'day', label: 'Dia' },
+            { k: 'time', label: 'Horário' }, { k: 'form', label: 'Seus dados' }
+        ];
+
+        function currentStepIndex() {
+            if (!flow.proId) return 0;
+            if (!flow.date) return 1;
+            if (!flow.time) return 2;
+            return 3;
+        }
+
+        function renderStepper() {
+            const idx = currentStepIndex();
+            const done = document.getElementById('step-done').style.display !== 'none';
+            const el = document.getElementById('stepper');
+            el.innerHTML = STEPS.map((s, i) => {
+                const cls = done ? 'done' : (i < idx ? 'done' : (i === idx ? 'current' : ''));
+                return `<div class="step-item ${cls}"><span class="step-num">${String(i + 1).padStart(2, '0')}</span><span class="step-label">${s.label}</span></div>` +
+                    (i < STEPS.length - 1 ? '<div class="step-sep"></div>' : '');
+            }).join('');
+        }
+
+        function showStepPanel() {
+            ['pro', 'day', 'time', 'form', 'done'].forEach(k => {
+                document.getElementById('step-' + k).style.display = 'none';
+            });
+            const idx = currentStepIndex();
+            const key = document.getElementById('step-done').dataset.show === '1' ? 'done' : STEPS[idx].k;
+            document.getElementById('step-' + key).style.display = 'block';
+        }
+
+        function backTo(step) {
+            if (step === 'pro') flow = { proId: null, date: null, time: null };
+            if (step === 'day') { flow.date = null; flow.time = null; }
+            if (step === 'time') { flow.time = null; }
+            document.getElementById('step-done').dataset.show = '0';
+            renderClientFlow();
+        }
+
+        function resetFlow() {
+            flow = { proId: null, date: null, time: null };
+            document.getElementById('step-done').dataset.show = '0';
+            renderClientFlow();
+        }
+
+        function renderClientFlow() {
+            renderStepper();
+            showStepPanel();
+            if (!flow.proId) renderProGrid();
+            else if (!flow.date) renderDayRow();
+            else if (!flow.time) renderTimeGrid();
+            else renderForm();
+        }
+
+        function renderProGrid() {
+            const grid = document.getElementById('proGrid');
+            if (professionals.length === 0) { grid.innerHTML = '<div class="empty">Nenhuma profissional cadastrada ainda.</div>'; return; }
+            grid.innerHTML = professionals.map(p => `
+    <button class="pro-card" onclick="selectPro('${escapeHTML(p.id)}')">
+      ${renderAvatarHtml(p)}
+      <div>
+        <div class="pro-name">${escapeHTML(p.name)}</div>
+        <div class="pro-role">${escapeHTML(p.role)}</div>
+      </div>
+      <div class="pro-cta">Ver agenda <svg viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3"/></svg></div>
+    </button>
+  `).join('');
+        }
+
+        function selectPro(id) { flow.proId = id; flow.date = null; flow.time = null; renderClientFlow(); }
+
+        function nextNDays(n) {
+            const out = []; const d = new Date();
+            for (let i = 0; i < n; i++) { const nd = new Date(d); nd.setDate(d.getDate() + i); out.push(nd); }
+            return out;
+        }
+
+        function dayKeyFromDate(date) { return ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'][date.getDay()]; }
+
+        function renderDayRow() {
+            const pro = professionals.find(p => p.id === flow.proId);
+            const row = document.getElementById('dayRow');
+            if (!pro) { row.innerHTML = '<div class="empty">Profissional não encontrada.</div>'; return; }
+            
+            const blockedSet = new Set(pro.blockedDates || []);
+
+            // Gera os próximos 30 dias para exibir todo o mês
+            const days = nextNDays(30).filter(d => {
+                const key = dayKeyFromDate(d);
+                const iso = fmtDate(d);
+                const isDayActive = pro.schedule && pro.schedule[key] && pro.schedule[key].on;
+                const isBlocked = blockedSet.has(iso);
+                return isDayActive && !isBlocked;
+            });
+
+            if (days.length === 0) { 
+                row.innerHTML = '<div class="empty">Sem dias disponíveis nos próximos 30 dias.</div>'; 
+                return; 
+            }
+
+            const wd = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            row.innerHTML = days.map(d => {
+                const iso = fmtDate(d);
+                return `<button class="chip ${flow.date === iso ? 'selected' : ''}" onclick="selectDay('${iso}')">
+      <div class="d1">${wd[d.getDay()]}</div><div class="d2">${d.getDate()}</div>
+    </button>`;
+            }).join('');
+        }
+
+        function selectDay(iso) { flow.date = iso; flow.time = null; renderClientFlow(); }
+
+        function genSlots(schedule, dayKey) {
+            const cfg = schedule[dayKey];
+            if (!cfg || !cfg.on) return [];
+            const [sh, sm] = cfg.start.split(':').map(Number);
+            const [eh, em] = cfg.end.split(':').map(Number);
+            let cur = sh * 60 + sm; const end = eh * 60 + em; const step = Number(cfg.interval) || 60;
+            const out = [];
+            while (cur < end) { out.push(String(Math.floor(cur / 60)).padStart(2, '0') + ':' + String(cur % 60).padStart(2, '0')); cur += step; }
+            return out;
+        }
+
+        function renderTimeGrid() {
+            const pro = professionals.find(p => p.id === flow.proId);
+            const dParts = flow.date.split('-').map(Number);
+            const dayObj = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+            const dayKey = dayKeyFromDate(dayObj);
+            const slots = genSlots(pro.schedule, dayKey);
+            const takenSet = new Set(bookings.filter(b => b.proId === pro.id && b.date === flow.date).map(b => b.time));
+            const grid = document.getElementById('timeGrid');
+            if (slots.length === 0) { grid.innerHTML = '<div class="empty">Sem horários configurados para este dia.</div>'; return; }
+            grid.innerHTML = slots.map(t => `
+    <button class="time-chip ${flow.time === t ? 'selected' : ''} ${takenSet.has(t) ? 'taken' : ''}" onclick="selectTime('${t}')">${t}</button>
+  `).join('');
+        }
+
+        function selectTime(t) { flow.time = t; renderClientFlow(); }
+
+        function renderForm() {
+            const pro = professionals.find(p => p.id === flow.proId);
+            const dParts = flow.date.split('-').map(Number);
+            const d = new Date(dParts[0], dParts[1] - 1, dParts[2]);
+            const wd = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+            document.getElementById('summaryBox').innerHTML =
+                `<div><b>Profissional:</b> ${escapeHTML(pro.name)} · ${escapeHTML(pro.role)}</div>
+     <div><b>Dia:</b> ${d.getDate()} de ${['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'][d.getMonth()]} (${wd[d.getDay()]})</div>
+     <div><b>Horário:</b> ${escapeHTML(flow.time)}</div>`;
+        }
+
+        async function confirmBooking() {
+            const btn = document.getElementById('btnConfirmBooking');
+            const name = document.getElementById('cName').value.trim();
+            const phone = document.getElementById('cPhone').value.trim();
+            const service = document.getElementById('cService').value.trim();
+            if (!name || !phone) { showToast('Preencha nome e WhatsApp'); return; }
+
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            const pro = professionals.find(p => p.id === flow.proId);
+            const booking = {
+                id: 'b' + Date.now(), proId: pro.id, date: flow.date, time: flow.time,
+                clientName: name, clientPhone: phone, service: service || 'não especificado',
+                price: pro.price || 0, createdAt: new Date().toISOString()
+            };
+
+            try {
+                await saveBookingDb(booking);
+                bookings.push(booking);
+
+                const dParts = flow.date.split('-').map(Number);
+                const dataFmt = `${String(dParts[2]).padStart(2, '0')}/${String(dParts[1]).padStart(2, '0')}`;
+                const msg = `Olá ${pro.name}! Vim pelo Glam e quero agendar:%0A%0A` +
+                    `Serviço: ${encodeURIComponent(service || 'a combinar')}%0A` +
+                    `Dia: ${dataFmt}%0A` +
+                    `Horário: ${flow.time}%0A` +
+                    `Nome: ${encodeURIComponent(name)}%0A` +
+                    `Meu WhatsApp: ${encodeURIComponent(phone)}`;
+                window.open(`https://wa.me/${pro.phone.replace(/\D/g, '')}?text=${msg}`, '_blank');
+
+                document.getElementById('step-done').dataset.show = '1';
+                renderClientFlow();
+            } catch (err) {
+                showToast(err.message || 'Erro ao realizar agendamento.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Confirmar e enviar no WhatsApp';
+            }
+        }
+
+        /* ============================================================
+           ADMIN — abas e visualizaciones
+           ============================================================ */
+        function adminTab(t) {
+            document.getElementById('tabProf').classList.toggle('active', t === 'prof');
+            document.getElementById('tabBookings').classList.toggle('active', t === 'bookings');
+            document.getElementById('tabDash').classList.toggle('active', t === 'dash');
+            
+            document.getElementById('admin-prof').style.display = t === 'prof' ? 'block' : 'none';
+            document.getElementById('admin-bookings').style.display = t === 'bookings' ? 'block' : 'none';
+            document.getElementById('admin-dash').style.display = t === 'dash' ? 'block' : 'none';
+            
+            if (t === 'prof') renderAdminPros();
+            if (t === 'bookings') renderAdminBookings();
+            if (t === 'dash') renderDashboard();
+        }
+
+        function renderAdminPros() {
+            const wrap = document.getElementById('proAdminList');
+            if (professionals.length === 0) { wrap.innerHTML = '<div class="empty">Nenhuma profissional cadastrada.</div>'; return; }
+            wrap.innerHTML = professionals.map(p => {
+                const link = `${location.origin}${location.pathname}?pro=${p.id}`;
+                return `
+    <div class="pro-list-item">
+      <div class="pro-mini">
+        ${renderAvatarHtml(p)}
+        <div>
+          <div class="pro-mini-name">${escapeHTML(p.name)}</div>
+          <div class="pro-mini-role">${escapeHTML(p.role)} · ${money(p.price)}</div>
+          <div class="link-box"><input readonly value="${escapeHTML(link)}"><button onclick="copyLink('${escapeHTML(link)}', this)">Copiar link</button></div>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button onclick="openProModal('${escapeHTML(p.id)}')">Editar / Bloqueios</button>
+        <button onclick="deletePro('${escapeHTML(p.id)}')">Remover</button>
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        function renderAdminBookings() {
+            const tbody = document.getElementById('bookingsAdminBody');
+            if (bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--ink-40)">Nenhum agendamento realizado até o momento.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = bookings.map(b => {
+                const pro = professionals.find(p => p.id === b.proId);
+                const proName = pro ? pro.name : 'N/A';
+                const dParts = b.date ? b.date.split('-') : ['00', '00', '00'];
+                const dataFmt = `${dParts[2]}/${dParts[1]}/${dParts[0]}`;
+                return `
+    <tr>
+      <td><b>${escapeHTML(b.clientName)}</b></td>
+      <td>${escapeHTML(b.clientPhone)}</td>
+      <td>${escapeHTML(b.service)}</td>
+      <td>${escapeHTML(proName)}</td>
+      <td>${dataFmt} às ${escapeHTML(b.time)}</td>
+      <td><button onclick="deleteBookingAdmin('${escapeHTML(b.id)}')" style="background:none;border:none;color:#7a2e2e;font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer">Cancelar</button></td>
+    </tr>`;
+            }).join('');
+        }
+
+        async function deleteBookingAdmin(id) {
+            if (!confirm('Deseja cancelar/remover este agendamento?')) return;
+            await deleteBookingDb(id);
+            bookings = bookings.filter(b => b.id !== id);
+            renderAdminBookings();
+            showToast('Agendamento removido.');
+        }
+
+        function copyLink(link, btn) {
+            navigator.clipboard?.writeText(link);
+            const old = btn.textContent; btn.textContent = 'Copiado!'; setTimeout(() => btn.textContent = old, 1500);
+        }
+
+        async function deletePro(id) {
+            if (!confirm('Remover esta profissional?')) return;
+            await deleteProfessionalDb(id);
+            professionals = professionals.filter(p => p.id !== id);
+            renderAdminPros();
+        }
+
+        function buildWeekEditor(schedule) {
+            const el = document.getElementById('weekEditor');
+            el.innerHTML = WEEKDAYS.map(w => {
+                const cfg = (schedule && schedule[w.k]) || { on: false, start: '09:00', end: '18:00', interval: 60 };
+                return `
+    <div class="day-toggle" data-day="${w.k}">
+      <div class="dt-head">
+        <label><input type="checkbox" ${cfg.on ? 'checked' : ''} onchange="toggleDay(this)"> ${w.label}</label>
+      </div>
+      <div class="dt-times ${cfg.on ? 'on' : ''}">
+        <input type="time" class="dt-start" value="${cfg.start || '09:00'}">
+        <input type="time" class="dt-end" value="${cfg.end || '18:00'}">
+        <input type="number" class="dt-interval" value="${cfg.interval || 60}" title="minutos por horário" style="width:60px">
+      </div>
+    </div>`;
+            }).join('');
+        }
+
+        function toggleDay(cb) {
+            cb.closest('.day-toggle').querySelector('.dt-times').classList.toggle('on', cb.checked);
+        }
+
+        function previewAvatar(input) {
+            const prev = document.getElementById('avatarPreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    prev.innerHTML = `<img src="${e.target.result}">`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function renderBlockedDatesTags() {
+            const list = document.getElementById('blockedDatesList');
+            if (!currentBlockedDates || !currentBlockedDates.length) {
+                list.innerHTML = '<span style="font-size:12px; color:var(--ink-40)">Nenhuma data específica bloqueada.</span>';
+                return;
+            }
+            list.innerHTML = currentBlockedDates.map(iso => {
+                const parts = iso.split('-');
+                const dateFmt = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                return `<div class="blocked-tag">
+                    <span>${dateFmt}</span>
+                    <button type="button" onclick="removeBlockedDate('${iso}')" title="Remover bloqueio">✕</button>
+                </div>`;
+            }).join('');
+        }
+
+        function addBlockedDate() {
+            const inp = document.getElementById('blockDateInput');
+            const val = inp.value;
+            if (!val) { showToast('Selecione uma data para bloquear'); return; }
+            if (!currentBlockedDates.includes(val)) {
+                currentBlockedDates.push(val);
+                currentBlockedDates.sort();
+                renderBlockedDatesTags();
+                showToast('Data adicionada aos bloqueios');
+            }
+            inp.value = '';
+        }
+
+        function removeBlockedDate(iso) {
+            currentBlockedDates = currentBlockedDates.filter(x => x !== iso);
+            renderBlockedDatesTags();
+        }
+
+        function openProModal(id) {
+            document.getElementById('proModalTitle').textContent = id ? 'Editar profissional' : 'Nova profissional';
+            const p = id ? professionals.find(x => x.id === id) : null;
+            document.getElementById('proId').value = id || '';
+            document.getElementById('proName').value = p ? p.name : '';
+            document.getElementById('proRole').value = p ? p.role : '';
+            document.getElementById('proPhone').value = p ? p.phone : '';
+            document.getElementById('proPrice').value = p ? p.price : '';
+            document.getElementById('proAvatarUrl').value = p ? (p.avatarUrl || '') : '';
+            document.getElementById('proAvatarInput').value = '';
+            
+            currentBlockedDates = p && p.blockedDates ? [...p.blockedDates] : [];
+            renderBlockedDatesTags();
+
+            const prev = document.getElementById('avatarPreview');
+            if (p && p.avatarUrl) {
+                prev.innerHTML = `<img src="${escapeHTML(p.avatarUrl)}">`;
+            } else {
+                prev.innerHTML = p ? p.name.charAt(0) : 'P';
+            }
+
+            buildWeekEditor(p ? p.schedule : null);
+            document.getElementById('proModalBg').classList.add('show');
+        }
+
+        function closeProModal() { document.getElementById('proModalBg').classList.remove('show'); }
+
+        async function saveProfessional() {
+            const btn = document.getElementById('btnSavePro');
+            const id = document.getElementById('proId').value;
+            const name = document.getElementById('proName').value.trim();
+            const role = document.getElementById('proRole').value.trim();
+            const phone = document.getElementById('proPhone').value.trim();
+            const price = Number(document.getElementById('proPrice').value) || 0;
+            const avatarInput = document.getElementById('proAvatarInput');
+            let avatarUrl = document.getElementById('proAvatarUrl').value;
+
+            if (!name || !role || !phone) { showToast('Preencha nome, função e WhatsApp'); return; }
+
+            btn.disabled = true;
+            btn.textContent = 'Salvando...';
+
+            try {
+                if (avatarInput.files && avatarInput.files[0]) {
+                    showToast('Enviando foto para Vercel Blob...');
+                    avatarUrl = await uploadBlobFile(avatarInput.files[0]);
+                }
+
+                const schedule = {};
+                document.querySelectorAll('#weekEditor .day-toggle').forEach(el => {
+                    const k = el.dataset.day;
+                    const on = el.querySelector('input[type=checkbox]').checked;
+                    schedule[k] = {
+                        on,
+                        start: el.querySelector('.dt-start').value,
+                        end: el.querySelector('.dt-end').value,
+                        interval: Number(el.querySelector('.dt-interval').value) || 60
+                    };
+                });
+
+                // Inclui blockedDates dentro do schedule para compatibilidade JSON no banco
+                schedule.blockedDates = currentBlockedDates;
+
+                let proObj;
+                if (id) {
+                    proObj = professionals.find(x => x.id === id);
+                    Object.assign(proObj, { name, role, phone, price, avatarUrl, schedule, blockedDates: currentBlockedDates });
+                } else {
+                    proObj = { id: 'p' + Date.now(), name, role, phone, price, avatarUrl, schedule, blockedDates: currentBlockedDates };
+                    professionals.push(proObj);
+                }
+
+                await saveProfessionalDb(proObj);
+                closeProModal(); 
+                renderAdminPros();
+                renderClientFlow();
+                showToast('Profissional salva com sucesso!');
+            } catch(err) {
+                showToast('Erro ao salvar profissional: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Salvar';
+            }
+        }
+
+        /* ============================================================
+           ADMIN — dashboard
+           ============================================================ */
+        async function addExpense() {
+            const desc = document.getElementById('expDesc').value.trim();
+            const val = Number(document.getElementById('expVal').value);
+            if (!desc || !val) { showToast('Preencha descrição e valor'); return; }
+            const expObj = { id: 'e' + Date.now(), desc, amount: val };
+            await saveExpenseDb(expObj);
+            expenses.push(expObj);
+            document.getElementById('expDesc').value = ''; document.getElementById('expVal').value = '';
+            renderDashboard();
+        }
+
+        async function removeExpense(id) {
+            await deleteExpenseDb(id);
+            expenses = expenses.filter(e => e.id !== id);
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            const receita = bookings.reduce((s, b) => s + (Number(b.price) || 0), 0);
+            const despesa = expenses.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+            const saldo = receita - despesa;
+
+            document.getElementById('statRow').innerHTML = `
+    <div class="stat-box"><div class="stat-label">Faturamento</div><div class="stat-value">${money(receita)}</div></div>
+    <div class="stat-box"><div class="stat-label">Despesas</div><div class="stat-value">${money(despesa)}</div></div>
+    <div class="stat-box"><div class="stat-label">Saldo</div><div class="stat-value ${saldo < 0 ? 'neg' : ''}">${money(saldo)}</div></div>
+    <div class="stat-box"><div class="stat-label">Agendamentos</div><div class="stat-value">${bookings.length}</div></div>
+  `;
+
+            const byPro = professionals.map(p => {
+                const total = bookings.filter(b => b.proId === p.id).reduce((s, b) => s + (Number(b.price) || 0), 0);
+                return { name: p.name, total };
+            }).sort((a, b) => b.total - a.total);
+            const max = Math.max(1, ...byPro.map(p => p.total));
+            document.getElementById('barList').innerHTML = byPro.length ? byPro.map(p => `
+    <div class="bar-row">
+      <div>${escapeHTML(p.name)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(p.total / max * 100)}%"></div></div>
+      <div class="bar-amt">${money(p.total)}</div>
+    </div>
+  `).join('') : '<div class="empty">Sem agendamentos ainda.</div>';
+
+            document.getElementById('expBody').innerHTML = expenses.length ? expenses.map(e => `
+    <tr><td>${escapeHTML(e.desc)}</td><td>${money(e.amount)}</td><td><button onclick="removeExpense('${escapeHTML(e.id)}')" style="background:none;border:none;color:var(--ink-40);font-size:11px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer">remover</button></td></tr>
+  `).join('') : '<tr><td colspan="3" style="color:var(--ink-40); padding:18px 8px">Nenhuma despesa registrada.</td></tr>';
+        }
+
+        /* ============================================================
+           MISC
+           ============================================================ */
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        /* ============================================================
+           INIT
+           ============================================================ */
+        (async function init() {
+            await loadAll();
+            const params = new URLSearchParams(location.search);
+            const proParam = params.get('pro');
+            if (proParam && professionals.find(p => p.id === proParam)) {
+                flow.proId = proParam;
+            }
+            renderClientFlow();
+        })();
+    </script>
+</body>
+
+</html>
